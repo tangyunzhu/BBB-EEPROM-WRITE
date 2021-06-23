@@ -1,0 +1,27 @@
+#!/bin/bash
+# tary, 2018-10-19 10:54
+
+TRIES=3
+eepid=""
+
+leds all off
+leds -t 1000 0 &
+pid_leds=$!
+
+for (( i = 0; i < $TRIES; i++ )); do
+	# eepid=113990554_18430000012
+	eepid=$(python barcode.py)
+#	echo "serial No is: " +  $eepid
+	[[ $eepid =~ ^[BBBIVC[0-9]{18}$ ]] && break;
+	[[ $eepid =~ ^[BBBVC[0-9]{17}$ ]] && break;
+done
+if [ $i -ge $TRIES ]; then
+	exit 1
+fi
+kill -9 "$pid_leds"
+
+leds all off
+echo -ne "$eepid" > bar_code.tmp
+
+exit $r
+
